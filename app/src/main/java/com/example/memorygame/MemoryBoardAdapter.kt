@@ -9,12 +9,14 @@ import android.widget.ImageButton
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.memorygame.models.BoardSize
+import com.example.memorygame.models.MemoryCard
 import kotlin.math.min
 
 class MemoryBoardAdapter(
     private val context: Context,
     private val boardSize: BoardSize,
-    private val cardImages: List<Int>
+    private val cards: List<MemoryCard>,
+    private val cardClickListener: MemoryBoardAdapter.CardClickListener
 ) :
     RecyclerView.Adapter<MemoryBoardAdapter.ViewHolder>() {
 
@@ -23,15 +25,8 @@ class MemoryBoardAdapter(
         private const val TAG = "MemoryBoardAdapter"
     }
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val imageButton = itemView.findViewById<ImageButton>(R.id.imageButton)
-
-        fun bind(position: Int) {
-            imageButton.setImageResource(cardImages[position])
-            imageButton.setOnClickListener {
-                Log.i(TAG, "Clicked on position $position")
-            }
-        }
+    interface CardClickListener {
+        fun OnCardClicked(position : Int)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -56,4 +51,21 @@ class MemoryBoardAdapter(
     }
 
     override fun getItemCount() = boardSize.numCards
+
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
+        private val imageButton = itemView.findViewById<ImageButton>(R.id.imageButton)
+
+        fun bind(position: Int) {
+
+            val memoryCard = cards[position]
+            imageButton.setImageResource(if(memoryCard.isFaceUp) memoryCard.Identifier else R.drawable.ic_launcher_background)
+
+            imageButton.setOnClickListener {
+                Log.v(TAG, "Clicked on position $position")
+                cardClickListener.OnCardClicked(position)
+            }
+        }
+    }
+
 }
